@@ -1,0 +1,12 @@
+package com.biz.gdata.config;
+
+/*
+ * 공공 DB에서 인증키를 발급받고 goDataAuth 값에 추가 하고
+ * DataGoConfig 로 클래스 이름을 변경한 후 사용하세요
+ */
+public class DataGoConfigSample {
+
+	public static final String goDataAuth = "YOUR DATA GO AUTH";
+	
+	
+}
