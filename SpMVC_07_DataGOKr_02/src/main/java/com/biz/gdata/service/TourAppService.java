@@ -19,6 +19,9 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class TourAppService {
 	
@@ -34,13 +37,14 @@ public class TourAppService {
 		queryString += "&_type=json";
 		queryString += "&MobileOS=ETC";
 		
-		queryString += String.format("&numOfRows=%d", 20);
-		queryString += String.format("&pageNo=%d", 1);
+		queryString += String.format("&numOfRows=%s", 20);
+		queryString += String.format("&pageNo=%s", 1);
 		
 		return queryString;
 		
 	}
 	
+	// 시도 리스트를 가져오는 query 문자열
 	public String getAreaQuery() throws UnsupportedEncodingException {
 		
 		String queryString = this.getHeaderQuery("areaCode");
@@ -49,12 +53,38 @@ public class TourAppService {
 		
 	}
 	
+	// 시도 리스트를 가져오는 query문자열 
+	//	+ 시군구 리스트를 가져오는 query 문자열 추가
+	public String getAreaQuery(String cityCode) throws UnsupportedEncodingException {
+		
+		String queryString = this.getHeaderQuery("areaCode");
+		queryString += "&areaCode=" + cityCode;
+		return queryString;
+		
+	}
+	
+	// Controller에서 호출
+	// city 코드가 없이 실행되는 코드
+	// 시도 리스트를 추출하도록
 	public List<CityVO> getAreaData() throws JsonSyntaxException, IOException {
+		return this.getAreaData(null);
+	}
+	
+	// Controller에서 호출
+	// 시도 리스트를 선택했을 때 호출
+	// city 코드가 있으면
+	// 시군구 리스트를 추출하도록
+	public List<CityVO> getAreaData(String cityCode) throws JsonSyntaxException, IOException {
 		
 		// 이 클래스에서 만든 query 문자열을
 		// tgSercice의 getData
-		String resString = tgService.getDataString(this.getAreaQuery());
-		
+		String resString = "";
+		if(cityCode == null) {
+			resString = tgService.getDataString(this.getAreaQuery());
+		} else {
+			resString = tgService.getDataString(this.getAreaQuery(cityCode));
+		}
+		log.debug(resString);
 		JsonElement jElement = JsonParser.parseString(resString);
 				
 		// response tag
@@ -82,30 +112,40 @@ public class TourAppService {
 		// List<Class> 형으로 변환하는 method 호출
 		Gson gson = new Gson();
 		List<CityVO> cityList = gson.fromJson(oitemList, cityToken.getType());
+		log.debug(cityList.toString());
 		
 		return cityList;
 		
 	}
 	
 	public String getAreaBaseQuery(String cityCode) throws UnsupportedEncodingException {
+		return this.getAreaBaseQuery(cityCode, null);
+	}
+	
+	// 지역의 관광정보를 가져오기 위한 method
+	public String getAreaBaseQuery(String cityCode, String sigun) throws UnsupportedEncodingException {
 		
 		String queryString = this.getHeaderQuery("areaBasedList");
 		
 		queryString += "&arrange=A";
 		queryString += "&contentTypeId=15";
 		queryString += String.format("&areaCode=%s", cityCode);
-		queryString += String.format("&sigunguCode=%s", cityCode);
+		// queryString += String.format("&sigunguCode=%s", cityCode);
 		queryString += "&listYN=Y";
+		
+		if(sigun != null) {
+			queryString += "&sigunguCode=" + sigun;
+		}
 		
 		return queryString;
 		
 	}
 	
-	public List<AreaBaseDTO> getAreaBaseListData(String cityCode) throws JsonSyntaxException, IOException {
+	public List<AreaBaseDTO> getAreaBaseListData(String cityCode, String sigun) throws JsonSyntaxException, IOException {
 		
-		String resString = tgService.getDataString(this.getAreaBaseQuery(cityCode));
-		
-		JsonElement jElement = JsonParser.parseString(this.getAreaBaseQuery(resString));
+		String resString = tgService.getDataString(this.getAreaBaseQuery(cityCode, sigun));
+		log.debug(resString);
+		JsonElement jElement = JsonParser.parseString(resString);
 
 		JsonObject oRes = (JsonObject) jElement.getAsJsonObject().get("response");
 	

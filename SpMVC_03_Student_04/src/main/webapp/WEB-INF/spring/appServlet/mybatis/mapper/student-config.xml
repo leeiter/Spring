@@ -9,9 +9,7 @@
 		<typeAlias 
 			type="com.biz.student.domain.StudentDTO" 
 			alias="StudentDTO"/>
-	</typeAliases>
-	
-	<typeAliases>
+
 		<typeAlias 
 			type="com.biz.student.domain.StudentVO" 
 			alias="StudentVO"/>

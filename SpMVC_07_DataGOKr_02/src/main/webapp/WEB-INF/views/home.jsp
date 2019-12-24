@@ -14,12 +14,20 @@
 		
 		$("#t_city").change(function() {
 			
-			let city_code = $(this).val()
+			// let city_code = $(this).val()
 			// alert(city_code)
+			$("#t_sigun").val(1)
 			$("form").submit()
 			
 		})
 		
+		$("#t_sigun").change(function() {
+			
+			// let city_code = $(this).val()
+			// alert(city_code)
+			$("form").submit()
+			
+		})
 		
 	})
 </script>
@@ -28,7 +36,11 @@
 <header>
 	<form:form modelAttribute="tourDTO" method="GET">
 		<form:select path="t_city">
-			<form:options items="${CITY}"  itemLable="name" itemValue="code" />
+			<form:options items="${CITY}"  itemLabel="name" itemValue="code" />
+		</form:select>
+		
+		<form:select path="t_sigun">
+			<form:options items="${SI}"  itemLabel="name" itemValue="code" />
 		</form:select>
 	</form:form>
 </header>
@@ -45,9 +57,7 @@
 					<p>주소 : ${base.addr1}</p>
 					<p>동명 : ${base.addr2}</p>
 					<p>전화번호 : ${base.tel}</p>
-					<p><img width="100px" alt="정보이미지" src="${base.firstimage}"></p>
-				
-					
+					<p><img width="100px" src="${base.firstimage}" alt="정보이미지"></p>
 				</c:forEach>
 			</c:otherwise>
 		</c:choose>

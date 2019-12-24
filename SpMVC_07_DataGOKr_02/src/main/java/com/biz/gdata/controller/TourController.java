@@ -18,6 +18,9 @@ import com.biz.gdata.domain.TourDTO;
 import com.biz.gdata.service.TourAppService;
 import com.google.gson.JsonSyntaxException;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Controller
 public class TourController {
 	
@@ -30,22 +33,31 @@ public class TourController {
 	TourAppService tService;
 	
 	@RequestMapping(value = "total", method = RequestMethod.GET, produces = "text/json;charset=UTF-8")
-	public String total(@RequestParam(value = "t_city", required = false, defaultValue = "1") String t_city, Model model) throws JsonSyntaxException, IOException {
+	public String total(@RequestParam(value = "t_city", required = false, defaultValue = "1") String t_city,
+			@RequestParam(value = "t_sigun", required = false, defaultValue = "1") String t_sigun,
+			Model model) throws JsonSyntaxException, IOException {
 		
-			List<AreaBaseDTO> baseList = tService.getAreaBaseListData(t_city);
-			
-			model.addAttribute("BASELIST", baseList);
+		log.debug("메인 컨트롤러");
 		
+		List<CityVO> sigunList = tService.getAreaData(t_city);
+		model.addAttribute("SI", sigunList);
+		
+		List<AreaBaseDTO> baseList = tService.getAreaBaseListData(t_city, t_sigun);
+		model.addAttribute("BASELIST", baseList);
 		
 		List<CityVO> cityList = null;
 		try {
 			cityList = tService.getAreaData();
+		} catch (JsonSyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
 
 		TourDTO tDTO = new TourDTO();
-		tDTO.setT_city("서울특별시");
+		tDTO.setT_city(t_city);
+		tDTO.setT_sigun(t_sigun);
 	
 		model.addAttribute("tourDTO", tDTO);
 		model.addAttribute("CITY", cityList);
